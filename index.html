@@ -1,0 +1,230 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GramBazaar | Raj Kumar Nayak</title>
+<style>
+:root{--green:#176b3a;--dark:#103d28;--gold:#ffca57;--bg:#f5f7f0}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:#203126}
+header{background:var(--dark);color:white;padding:16px 5%;display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+.logo{font-size:27px;font-weight:800;color:var(--gold)}
+.logo span{color:white}
+header p{margin:5px 0 0;font-size:12px;color:#d9e8dc}
+.cart-button,.btn{border:0;border-radius:10px;padding:11px 16px;background:var(--gold);color:#183c24;font-weight:bold;cursor:pointer}
+.hero{padding:55px 6%;background:linear-gradient(90deg,#103d28ed,#103d2880),url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1600&q=85') center/cover;color:white}
+.hero h1{font-size:clamp(32px,5vw,55px);max-width:650px;margin:0 0 14px}
+.hero p{max-width:560px;line-height:1.7}
+.hero .btn{display:inline-block;text-decoration:none;margin-top:12px}
+.search-area{padding:22px 5%;display:flex;gap:10px;flex-wrap:wrap}
+input,select,textarea{padding:12px;border:1px solid #ccd7cc;border-radius:9px;font:inherit;min-width:0}
+#search{flex:1;min-width:180px}
+main{padding:0 5% 40px}
+.section-heading{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.section-heading h2{color:var(--dark)}
+.products{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:18px}
+.card{background:white;border:1px solid #e3e9df;border-radius:15px;overflow:hidden;box-shadow:0 4px 15px #163e1a0b}
+.card img{width:100%;height:170px;object-fit:cover;background:#e8eee5}
+.card-content{padding:14px}
+.category{font-size:12px;color:var(--green);font-weight:bold;text-transform:uppercase}
+.card h3{margin:8px 0}
+.card p{font-size:13px;line-height:1.5;color:#657166;min-height:39px}
+.price{font-size:20px;font-weight:bold;color:var(--green)}
+.stock{font-size:12px;color:#4d7854;margin:8px 0}
+.actions{display:flex;gap:8px;margin-top:12px}
+.actions button{flex:1;padding:10px 6px;border:0;border-radius:8px;cursor:pointer;font-weight:bold}
+.details{background:#edf4e9;color:var(--green)}
+.add{background:var(--green);color:white}
+.panel{background:white;border-radius:15px;padding:20px;margin:22px 0;border:1px solid #e3e9df}
+.panel h2{margin-top:0;color:var(--dark)}
+.cart-row{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #e5e9e2;flex-wrap:wrap}
+.qty button{padding:5px 10px;cursor:pointer}
+#total{font-size:24px;color:var(--green);font-weight:bold}
+form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+form input,form select,form textarea{width:100%}
+form textarea{grid-column:1/-1}
+form button{grid-column:1/-1}
+footer{text-align:center;background:var(--dark);color:white;padding:25px;line-height:1.8}
+.modal{display:none;position:fixed;inset:0;background:#0009;z-index:5;align-items:center;justify-content:center;padding:18px}
+.modal-box{background:white;border-radius:16px;max-width:520px;width:100%;max-height:90vh;overflow:auto;padding:20px}
+.modal-box img{width:100%;height:220px;object-fit:cover;border-radius:10px}
+.close{float:right;cursor:pointer;border:0;background:#eee;padding:8px 12px;border-radius:7px}
+@media(max-width:600px){header{align-items:flex-start}.hero{padding:38px 6%}.products{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card img{height:125px}.card-content{padding:10px}.card p{font-size:12px}.actions{flex-direction:column}form{grid-template-columns:1fr}form textarea,form button{grid-column:1}}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="logo">🌾 Gram<span>Bazaar</span></div>
+    <p>Local Products • Trusted Shopping • Easy Ordering</p>
+  </div>
+  <button class="cart-button" onclick="document.getElementById('cartSection').scrollIntoView({behavior:'smooth'})">🛒 Cart (<span id="cartCount">0</span>)</button>
+</header>
+
+<section class="hero">
+  <h1>Your Local Market, Now Online!</h1>
+  <p>Rice, wheat, furniture, construction materials, plants, Diwali lights, mitti ke diye aur DJ services — sab ek jagah.</p>
+  <a class="btn" href="#productsSection">Shop Products ↓</a>
+</section>
+
+<div class="search-area">
+  <input id="search" placeholder="🔍 Search rice, furniture, diya..." oninput="renderProducts()">
+  <select id="category" onchange="renderProducts()">
+    <option value="All">All Categories</option>
+    <option>Grains</option><option>Furniture</option><option>Construction</option>
+    <option>Paint</option><option>Plants</option><option>Diwali Lights</option>
+    <option>Diwali Diyas</option><option>DJ</option><option>Other</option>
+  </select>
+</div>
+
+<main>
+  <div class="section-heading" id="productsSection">
+    <h2>🛍️ Our Products</h2>
+    <span id="productCount"></span>
+  </div>
+  <div class="products" id="products"></div>
+
+  <section class="panel" id="cartSection">
+    <h2>🛒 Your Shopping Cart</h2>
+    <div id="cartItems">Your cart is empty.</div>
+    <p>Total: <span id="total">₹0</span></p>
+    <button class="btn" onclick="document.getElementById('orderSection').scrollIntoView({behavior:'smooth'})">Proceed to Order</button>
+  </section>
+
+  <section class="panel" id="orderSection">
+    <h2>📦 Customer & Order Details</h2>
+    <p>Details fill karke WhatsApp par order bhejein.</p>
+    <form id="orderForm">
+      <input id="customerName" placeholder="Your full name" required>
+      <input id="mobile" placeholder="Mobile number" type="tel" required pattern="[0-9 +()-]{10,16}">
+      <input id="address" placeholder="Full delivery address" required>
+      <select id="payment">
+        <option>Cash on Delivery (confirm with seller)</option>
+        <option>UPI (confirm with seller)</option>
+        <option>Pickup from shop</option>
+      </select>
+      <textarea id="notes" rows="3" placeholder="Extra details / quantity / delivery instructions"></textarea>
+      <button class="btn" type="submit">Send Order on WhatsApp</button>
+    </form>
+  </section>
+</main>
+
+<div class="modal" id="productModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <button class="close" onclick="closeModal()">✕ Close</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<footer>
+  <strong>🌾 GramBazaar</strong><br>
+  Local Shopping Made Easy<br>
+  Website project created by <strong>Raj Kumar Nayak | Class 9th</strong>
+</footer>
+
+<script>
+// IMPORTANT: Replace this demo number with your seller's WhatsApp number.
+// Include country code, without +, spaces or dashes. Example: 91XXXXXXXXXX
+const SELLER_WHATSAPP = "919876543210";
+
+const products = [
+{id:1,name:"Premium Rice (Chawal)",category:"Grains",price:60,unit:"kg",stock:"In stock",brand:"Local Farm",image:"https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=700&q=80",description:"Daily cooking ke liye quality rice. Seller se variety aur grain quality confirm karein.",specs:"Category: Food grains | Unit: 1 kg | Storage: Dry, cool place"},
+{id:2,name:"Wheat (Gehu)",category:"Grains",price:35,unit:"kg",stock:"In stock",brand:"Local Farm",image:"https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=700&q=80",description:"Roti aur atta banane ke liye wheat grains.",specs:"Category: Food grains | Unit: 1 kg | Storage: Dry place"},
+{id:3,name:"Chana Dal",category:"Grains",price:90,unit:"kg",stock:"In stock",brand:"Local Store",image:"https://images.unsplash.com/photo-1515543904379-3d757afe72e4?auto=format&fit=crop&w=700&q=80",description:"Everyday cooking ke liye dal.",specs:"Category: Pulses | Unit: 1 kg | Store in airtight container"},
+{id:4,name:"Wooden Furniture Table",category:"Furniture",price:2500,unit:"piece",stock:"Ask availability",brand:"Local Carpenter",image:"https://images.unsplash.com/photo-1533090481720-856c6e3c1fdc?auto=format&fit=crop&w=700&q=80",description:"Home ya study room ke liye wooden table. Order se pehle size aur wood type confirm karein.",specs:"Material: Wood (confirm type) | Size: Confirm with seller | Assembly: Ask seller"},
+{id:5,name:"Wooden Chair",category:"Furniture",price:1200,unit:"piece",stock:"Ask availability",brand:"Local Carpenter",image:"https://images.unsplash.com/photo-1503602642458-232111445657?auto=format&fit=crop&w=700&q=80",description:"Home, office ya study ke liye chair.",specs:"Material: Wood | Colour: As available | Dimensions: Confirm with seller"},
+{id:6,name:"Living Room Sofa",category:"Furniture",price:9500,unit:"piece",stock:"Made to order",brand:"Local Furniture",image:"https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=700&q=80",description:"Living room furniture. Fabric, size aur delivery seller se confirm karein.",specs:"Type: Sofa | Colour: As available | Dimensions: Ask seller"},
+{id:7,name:"Cement Bag",category:"Construction",price:380,unit:"bag",stock:"Ask availability",brand:"Brand to confirm",image:"https://images.unsplash.com/photo-1513467655676-561b7d489a88?auto=format&fit=crop&w=700&q=80",description:"Construction work ke liye cement. Brand, weight aur manufacturing date check karein.",specs:"Unit: 1 bag | Bag weight and brand: Confirm before purchase"},
+{id:8,name:"Building Sand / Gara",category:"Construction",price:1200,unit:"load",stock:"Ask availability",brand:"Local Supplier",image:"https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=700&q=80",description:"Construction material delivery. Load quantity aur transport charge pehle confirm karein.",specs:"Unit: Demo load | Quantity, grade and delivery: Confirm with seller"},
+{id:9,name:"Construction Bricks",category:"Construction",price:10,unit:"piece",stock:"Ask availability",brand:"Local Supplier",image:"https://images.unsplash.com/photo-1590725140246-20acddd2a9f9?auto=format&fit=crop&w=700&q=80",description:"Building construction ke liye bricks.",specs:"Unit: 1 piece | Size and quality: Confirm with seller"},
+{id:10,name:"Wall Paint",category:"Paint",price:850,unit:"litre",stock:"Ask availability",brand:"Brand to confirm",image:"https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=700&q=80",description:"Walls ke liye paint. Shade, finish aur coverage seller se check karein.",specs:"Unit: Demo price per litre | Colour and finish: Confirm before buying"},
+{id:11,name:"Small Decorative Plant",category:"Plants",price:120,unit:"plant",stock:"Seasonal",brand:"Local Nursery",image:"https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&w=700&q=80",description:"Home, desk ya balcony ke liye small plant.",specs:"Type: Depends on availability | Pot included: Confirm with seller"},
+{id:12,name:"Small Tree Sapling",category:"Plants",price:80,unit:"plant",stock:"Seasonal",brand:"Local Nursery",image:"https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=700&q=80",description:"Garden aur plantation ke liye sapling. Plant variety pehle select karein.",specs:"Plant species: Confirm | Sunlight and watering: Depends on species"},
+{id:13,name:"Diwali Joylite LED Lights",category:"Diwali Lights",price:250,unit:"set",stock:"Seasonal",brand:"Brand to confirm",image:"https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=700&q=80",description:"Diwali decoration ke liye LED lights. Length, colour aur power supply check karein.",specs:"Unit: 1 set | Length and power details: Confirm with seller"},
+{id:14,name:"Decorative Fairy Lights",category:"Diwali Lights",price:180,unit:"set",stock:"Seasonal",brand:"Brand to confirm",image:"https://images.unsplash.com/photo-1512389142860-9c449e58a543?auto=format&fit=crop&w=700&q=80",description:"Room, balcony aur festive decoration ke liye lights.",specs:"Light colour: As available | Indoor/outdoor rating: Check packaging"},
+{id:15,name:"Mitti ke Diye",category:"Diwali Diyas",price:60,unit:"pack",stock:"Seasonal",brand:"Local Potter",image:"https://images.unsplash.com/photo-1603006905003-be475563bc59?auto=format&fit=crop&w=700&q=80",description:"Traditional clay diyas for Diwali puja and home decoration.",specs:"Unit: Demo pack | Number of diyas per pack: Confirm with seller"},
+{id:16,name:"Decorative Diya Set",category:"Diwali Diyas",price:150,unit:"set",stock:"Seasonal",brand:"Local Artisan",image:"https://images.unsplash.com/photo-1606293926075-69a00dbfde81?auto=format&fit=crop&w=700&q=80",description:"Festival decoration ke liye decorative diya set.",specs:"Material and pieces per set: Confirm with seller"},
+{id:17,name:"DJ Sound Service",category:"DJ",price:3000,unit:"event",stock:"Booking required",brand:"Local DJ Service",image:"https://images.unsplash.com/photo-1571266028243-d220c9c3b8c3?auto=format&fit=crop&w=700&q=80",description:"Party, wedding aur festival ke liye DJ service. Date, duration aur sound setup discuss karein.",specs:"Unit: Demo starting price per event | Duration, travel and equipment: Confirm"},
+{id:18,name:"Fresh Vegetables",category:"Other",price:40,unit:"kg",stock:"Daily availability",brand:"Local Farmer",image:"https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=700&q=80",description:"Seasonal fresh vegetables. Exact variety daily availability par depend karegi.",specs:"Unit: Demo price per kg | Final price depends on selected vegetable"},
+{id:19,name:"Seasonal Fruits",category:"Other",price:100,unit:"kg",stock:"Daily availability",brand:"Local Farmer",image:"https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&w=700&q=80",description:"Seasonal fruits. Freshness, variety aur quantity order ke waqt confirm karein.",specs:"Unit: Demo price per kg | Fruit variety: Confirm with seller"},
+{id:20,name:"Firewood / Lakdi",category:"Other",price:500,unit:"bundle",stock:"Ask availability",brand:"Local Supplier",image:"https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=700&q=80",description:"Fuel ya other permitted uses ke liye wood. Type aur bundle size confirm karein.",specs:"Unit: Demo bundle | Wood type and quantity: Confirm with seller"}
+];
+
+let cart = {};
+
+function money(n){return "₹"+Number(n).toLocaleString("en-IN")}
+function renderProducts(){
+  const q=document.getElementById("search").value.toLowerCase().trim();
+  const cat=document.getElementById("category").value;
+  const list=products.filter(p=>(cat==="All"||p.category===cat)&&
+    (p.name+" "+p.category+" "+p.description).toLowerCase().includes(q));
+  document.getElementById("productCount").textContent=list.length+" products";
+  document.getElementById("products").innerHTML=list.map(p=>`
+    <article class="card">
+      <img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/600x400?text=GramBazaar+Product'">
+      <div class="card-content">
+        <span class="category">${p.category}</span>
+        <h3>${p.name}</h3>
+        <p>${p.description}</p>
+        <div class="price">${money(p.price)} <small>/ ${p.unit}</small></div>
+        <div class="stock">● ${p.stock}</div>
+        <div class="actions">
+          <button class="details" onclick="showDetails(${p.id})">Details</button>
+          <button class="add" onclick="addToCart(${p.id})">+ Add</button>
+        </div>
+      </div>
+    </article>`).join("")||"<p>No products found. Try another search.</p>";
+}
+function showDetails(id){
+  const p=products.find(x=>x.id===id);
+  document.getElementById("modalContent").innerHTML=`
+    <img src="${p.image}" alt="${p.name}" onerror="this.src='https://placehold.co/600x400?text=Product'">
+    <span class="category">${p.category}</span><h2>${p.name}</h2>
+    <h3 class="price">${money(p.price)} / ${p.unit}</h3>
+    <p>${p.description}</p><p><strong>Brand / Supplier:</strong> ${p.brand}</p>
+    <p><strong>Stock:</strong> ${p.stock}</p><p><strong>Product Details:</strong> ${p.specs}</p>
+    <p><small>Price is a demo price. Confirm final price, availability and delivery with the seller.</small></p>
+    <button class="btn" onclick="addToCart(${p.id});closeModal()">Add to Cart</button>`;
+  document.getElementById("productModal").style.display="flex";
+}
+function closeModal(){document.getElementById("productModal").style.display="none"}
+function addToCart(id){cart[id]=(cart[id]||0)+1;renderCart()}
+function changeQty(id,delta){cart[id]=(cart[id]||0)+delta;if(cart[id]<=0)delete cart[id];renderCart()}
+function renderCart(){
+  const entries=Object.entries(cart);
+  document.getElementById("cartCount").textContent=entries.reduce((s,[id,q])=>s+q,0);
+  const total=entries.reduce((s,[id,q])=>s+products.find(p=>p.id==id).price*q,0);
+  document.getElementById("total").textContent=money(total);
+  document.getElementById("cartItems").innerHTML=entries.length?entries.map(([id,q])=>{
+    const p=products.find(x=>x.id==id);
+    return `<div class="cart-row"><div><strong>${p.name}</strong><br>${money(p.price)} × ${q} ${p.unit}</div>
+    <div class="qty"><button onclick="changeQty(${id},-1)">−</button> ${q} <button onclick="changeQty(${id},1)">+</button></div>
+    <strong>${money(p.price*q)}</strong></div>`;
+  }).join(""):"Your cart is empty.";
+}
+document.getElementById("orderForm").addEventListener("submit",function(e){
+  e.preventDefault();
+  if(!Object.keys(cart).length){alert("Please add at least one product to your cart.");return}
+  const name=document.getElementById("customerName").value.trim();
+  const mobile=document.getElementById("mobile").value.trim();
+  const address=document.getElementById("address").value.trim();
+  const payment=document.getElementById("payment").value;
+  const notes=document.getElementById("notes").value.trim();
+  const lines=Object.entries(cart).map(([id,q])=>{
+    const p=products.find(x=>x.id==id);
+    return `• ${p.name} — ${q} ${p.unit} × ${money(p.price)} = ${money(p.price*q)}`;
+  }).join("\n");
+  const total=Object.entries(cart).reduce((s,[id,q])=>s+products.find(p=>p.id==id).price*q,0);
+  const message=`🌾 *GramBazaar Order*\n\nCustomer: ${name}\nMobile: ${mobile}\nAddress: ${address}\n\n*Products:*\n${lines}\n\n*Demo subtotal: ${money(total)}*\nPayment preference: ${payment}\nExtra notes: ${notes||"None"}\n\nPlease confirm final price, stock and delivery charges.`;
+  if(SELLER_WHATSAPP==="919876543210"){
+    alert("Important: Please change SELLER_WHATSAPP in the code to your real seller WhatsApp number before placing an order.");
+  }
+  window.open("https://wa.me/"+SELLER_WHATSAPP+"?text="+encodeURIComponent(message),"_blank");
+});
+renderProducts();
+renderCart();
+</script>
+</body>
+</html>
